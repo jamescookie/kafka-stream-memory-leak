@@ -1,0 +1,58 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.4.2"
+    id("io.micronaut.aot") version "4.4.2"
+}
+
+version = "0.1"
+group = "com.example"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+
+    implementation("org.apache.kafka:kafka-streams:3.8.0")
+//    implementation("org.apache.kafka:kafka-streams:3.7.1")
+
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("io.micronaut:micronaut-http-client")
+    runtimeOnly("ch.qos.logback:logback-classic")
+
+    testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation("org.testcontainers:kafka:1.19.8")
+    testImplementation("org.awaitility:awaitility:4.2.2")
+}
+
+application {
+    mainClass = "com.example.Application"
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.example.*")
+    }
+    aot {
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+        replaceLogbackXml = true
+    }
+}
